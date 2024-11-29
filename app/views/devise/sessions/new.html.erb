@@ -1,0 +1,37 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center bg-dark text-white">
+          <h4>Вхід</h4>
+        </div>
+        <div class="card-body">
+          <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+            <div class="form-group">
+              <%= f.label :email, 'Електронна пошта' %>
+              <%= f.email_field :email, class: 'form-control', autofocus: true, autocomplete: "email" %>
+            </div>
+
+            <div class="form-group mt-3">
+              <%= f.label :password, 'Пароль' %>
+              <%= f.password_field :password, class: 'form-control', autocomplete: "current-password" %>
+            </div>
+
+            <div class="form-check mt-3">
+              <%= f.check_box :remember_me, class: 'form-check-input' %>
+              <%= f.label :remember_me, 'Запам’ятати мене', class: 'form-check-label' %>
+            </div>
+
+            <div class="text-center mt-4">
+              <%= f.submit 'Увійти', class: 'btn btn-dark w-100' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <%= link_to 'Забули пароль?', new_password_path(resource_name), class: 'text-secondary' %><br>
+        <%= link_to 'Ще не зареєстровані? Зареєструватися', new_registration_path(resource_name), class: 'text-primary' %>
+      </div>
+    </div>
+  </div>
+</div>

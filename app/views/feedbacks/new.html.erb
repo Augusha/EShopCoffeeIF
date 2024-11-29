@@ -1,0 +1,57 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center bg-dark text-white">
+          <h4>Зворотній зв'язок</h4>
+        </div>
+        <div class="card-body">
+          <%= form_with model: @feedback, url: feedbacks_path, local: true do |f| %>
+            <div class="form-group">
+              <%= f.label :name, 'Ваше ім’я' %>
+              <%= f.text_field :name, class: 'form-control', required: true %>
+            </div>
+
+            <div class="form-group mt-3">
+              <%= f.label :email, 'Ваша електронна пошта' %>
+              <%= f.email_field :email, class: 'form-control', required: true %>
+            </div>
+
+            <div class="form-group mt-3">
+              <%= f.label :message, 'Ваше повідомлення' %>
+              <%= f.text_area :message, class: 'form-control', rows: 4, required: true %>
+            </div>
+
+            <div class="text-center mt-4">
+              <%= f.submit 'Відправити', class: 'btn btn-dark w-100' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <%= link_to 'Повернутися на головну', root_path, style: 'color: black; text-decoration: none;' %>
+      </div>
+    </div>
+  </div>
+
+  <% if current_user.admin? %>
+    <% if @feedbacks.present? %>
+      <div class="mt-5 mb-5">
+        <h4>Перегляд зворотного зв'язку</h4>
+        <% @feedbacks.each do |feedback| %>
+          <div class="card mt-3">
+            <div class="card-header">
+              <strong><%= feedback.name %></strong> (<%= feedback.email %>)
+            </div>
+            <div class="card-body">
+              <p><%= feedback.message %></p>
+              <%= button_to 'Видалити', feedback_path(feedback), method: :delete, data: { confirm: 'Ви впевнені, що хочете видалити цей відгук?' }, class: 'btn btn-danger' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="mt-5">Немає жодного відгуку для перегляду.</p>
+    <% end %>
+  <% end %>
+</div>

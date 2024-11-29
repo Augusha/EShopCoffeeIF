@@ -1,0 +1,213 @@
+<section id="cart" class="container my-5">
+  <h2 class="mb-4">Ваш кошик</h2>
+  <% if @cart_items.empty? %>
+    <p>Ваш кошик порожній.</p>
+  <% else %>
+    <p>Товари в кошику: <%= @cart_items.count %></p>
+    <p>Загальна сума: <%= @total_price %> грн</p>
+    <table class="table table-bordered bg-light">
+      <thead>
+      <tr>
+        <th scope="col">Назва</th>
+        <th scope="col">Ціна</th>
+        <th scope="col">Дія</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @cart_items.each do |item| %>
+        <tr>
+          <td><%= link_to item.product.name, product_path(item.product), class: 'text-decoration-none text-dark' %></td>
+          <td><%= item.product.price %> грн</td>
+          <td><%= button_to 'Видалити', cart_item_path(item), method: :delete, class: 'btn btn-danger btn-sm' %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+
+    <!-- Кнопка для відкриття модального вікна -->
+    <button type="button" class="btn btn-dark btn-lg" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+      Оформити замовлення
+    </button>
+  <% end %>
+</section>
+
+<!-- Модальне вікно для оформлення замовлення -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="checkoutModalLabel">Оформлення замовлення</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <%= form_with url: checkout_path, method: :post, local: true, id: 'checkoutForm' do |f| %>
+          <div class="form-group mt-3">
+            <%= f.label :delivery_method, 'Спосіб доставки' %>
+            <%= f.select :delivery_method,
+                         [['Кур’єрська доставка', 'courier'],
+                          ['Самовивіз', 'pickup'],
+                          ['Пошта', 'post']],
+                         { prompt: 'Оберіть спосіб доставки' },
+                         class: 'form-control', id: 'deliveryMethod' %>
+          </div>
+
+          <div class="form-group mt-3 d-none" id="deliveryAddressField">
+            <%= f.label :address, 'Адреса доставки' %>
+            <%= f.text_field :address, class: 'form-control' %>
+          </div>
+
+          <div class="form-group mt-3 d-none" id="postalCodeField">
+            <%= f.label :postal_code, 'Поштовий індекс' %>
+            <%= f.text_field :postal_code, class: 'form-control' %>
+          </div>
+
+          <div class="form-group mt-3 d-none" id="storeAddressField">
+            <label>Адреса магазину</label>
+            <p class="form-control-plaintext">м. Київ, вул. Хрещатик, 1</p>
+          </div>
+
+          <div class="form-group mt-3">
+            <%= f.label :payment_method, 'Спосіб оплати' %>
+            <%= f.select :payment_method,
+                         [['Кредитна карта', 'credit_card'],
+                          ['Оплата при отриманні', 'cash_on_delivery'],
+                          ['Розрахунок готівкою', 'bank_transfer']],
+                         { prompt: 'Оберіть спосіб оплати' },
+                         class: 'form-control', id: 'paymentMethod' %>
+          </div>
+
+          <div class="form-group mt-3 d-none" id="creditCardField">
+            <%= f.label :credit_card_number, 'Номер кредитної карти' %>
+            <%= f.text_field :credit_card_number, class: 'form-control' %>
+          </div>
+
+          <div class="form-group mt-3">
+            <%= f.submit 'Підтвердити замовлення', class: 'btn btn-success w-100' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="products" class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Наші товари</h2>
+    <% if user_signed_in? && current_user.admin? %>
+      <%= link_to 'Додати новий продукт', new_product_path, class: 'btn btn-dark' %>
+    <% end %>
+  </div>
+
+  <div class="row">
+    <% @products.each do |product| %>
+      <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div class="card shadow-sm position-relative bg-light">
+          <% if product.image_url.present? %>
+            <%= link_to product_path(product) do %>
+              <img src="<%= product.image_url %>" alt="<%= product.name %>" class="product-image" />
+            <% end %>
+          <% else %>
+            <div class="card-body">
+              <p class="text-center">Немає зображення</p>
+            </div>
+          <% end %>
+          <div class="card-body">
+            <h5 class="card-title">
+              <%= link_to product.name, product_path(product), style: 'color: black; !important; text-decoration: none; !important;' %>
+            </h5>
+            <p class="card-text"><%= product.description %></p>
+            <p class="card-text price">Ціна: <%= product.price %> грн</p>
+
+            <% if user_signed_in? && current_user.admin? %>
+              <%= button_to product_path(product), method: :delete, data: { confirm: 'Ви впевнені, що хочете видалити цей продукт?' }, class: 'btn btn-danger position-absolute top-0 end-0 m-2' do %>
+                <i class="fas fa-trash"></i>
+              <% end %>
+            <% end %>
+
+            <%= button_to 'Додати в кошик', add_to_cart_path(product_id: product.id), method: :post, class: 'btn btn-dark' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const deliveryMethodSelect = document.getElementById('deliveryMethod');
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+
+        const deliveryAddressField = document.getElementById('deliveryAddressField');
+        const storeAddressField = document.getElementById('storeAddressField');
+        const postalCodeField = document.getElementById('postalCodeField');
+        const creditCardField = document.getElementById('creditCardField');
+        const checkoutForm = document.getElementById('checkoutForm');
+
+        // Function to check if the required fields are filled
+        const validateForm = () => {
+            let isValid = true;
+            const addressField = document.querySelector('[name="order[address]"]');
+            const postalCodeFieldInput = document.querySelector('[name="order[postal_code]"]');
+            const creditCardNumberField = document.querySelector('[name="order[credit_card_number]"]');
+
+            // Check if delivery address is required based on delivery method
+            if (deliveryMethodSelect.value !== 'pickup' && !addressField.value) {
+                isValid = false;
+                alert("Будь ласка, введіть адресу доставки.");
+            }
+
+            // Check if postal code is required for 'post' delivery method
+            if (deliveryMethodSelect.value === 'post' && !postalCodeFieldInput.value) {
+                isValid = false;
+                alert("Будь ласка, введіть поштовий індекс.");
+            }
+
+            // Check if credit card number is required for 'credit_card' payment method
+            if (paymentMethodSelect.value === 'credit_card' && !creditCardNumberField.value) {
+                isValid = false;
+                alert("Будь ласка, введіть номер кредитної карти.");
+            }
+
+            return isValid;
+        };
+
+        // On form submission, check the validation
+        checkoutForm.addEventListener('submit', (event) => {
+            if (!validateForm()) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+
+        // Event listeners for dynamically showing/hiding fields
+        deliveryMethodSelect.addEventListener('change', (event) => {
+            const selectedValue = event.target.value;
+
+            if (selectedValue === 'courier' || selectedValue === 'post') {
+                deliveryAddressField.classList.remove('d-none');
+                storeAddressField.classList.add('d-none');
+            } else if (selectedValue === 'pickup') {
+                deliveryAddressField.classList.add('d-none');
+                storeAddressField.classList.remove('d-none');
+            } else {
+                deliveryAddressField.classList.add('d-none');
+                storeAddressField.classList.add('d-none');
+            }
+
+            // Display postal code field for 'post' delivery method
+            if (selectedValue === 'post') {
+                postalCodeField.classList.remove('d-none');
+            } else {
+                postalCodeField.classList.add('d-none');
+            }
+        });
+
+        paymentMethodSelect.addEventListener('change', (event) => {
+            if (event.target.value === 'credit_card') {
+                creditCardField.classList.remove('d-none');
+            } else {
+                creditCardField.classList.add('d-none');
+            }
+        });
+    });
+
+</script>

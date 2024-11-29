@@ -1,0 +1,63 @@
+<section id="add-product" class="container my-5">
+  <h1 class="mb-4">Додати новий продукт</h1>
+
+  <%= form_with(model: @product, local: true, html: { class: "product-form" }) do |form| %>
+
+    <% if @product.errors.any? %>
+      <div id="error_explanation" class="alert alert-danger">
+        <h2><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h2>
+        <ul>
+          <% @product.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-3">
+      <%= form.label :name, class: 'form-label' %>
+      <%= form.text_field :name, class: 'form-control', placeholder: "Введіть назву продукту" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :description, class: 'form-label' %>
+      <%= form.text_area :description, class: 'form-control', placeholder: "Введіть опис продукту" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :price, class: 'form-label' %>
+      <%= form.number_field :price, class: 'form-control', step: "0.01", placeholder: "Введіть ціну" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :image_url, class: 'form-label' %>
+      <%= form.text_field :image_url, class: 'form-control', placeholder: "URL зображення (опціонально)" %>
+    </div>
+
+    <!-- Додаткові поля для магазину кавових апаратів -->
+    <div class="mb-3">
+      <%= form.label :category, class: 'form-label' %>
+      <%= form.text_field :category, class: 'form-control', placeholder: "Категорія товару (наприклад, кавоварки)" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :manufacturer, class: 'form-label' %>
+      <%= form.text_field :manufacturer, class: 'form-control', placeholder: "Виробник" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :release_date, class: 'form-label' %>
+      <%= form.date_select :release_date, class: 'form-control' %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :warranty_period, class: 'form-label' %>
+      <%= form.number_field :warranty_period, class: 'form-control', placeholder: "Тривалість гарантії (в місяцях)" %>
+    </div>
+
+    <div class="actions mt-4">
+      <%= form.submit "Додати продукт", class: 'btn btn-primary' %>
+    </div>
+
+  <% end %>
+</section>
